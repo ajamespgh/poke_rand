@@ -2,17 +2,18 @@
 {% set active_page = nav %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<div class="container-lg">
-    <div class="row border">
-        <div class="col pl-4">
+<div class="bg-dark">
+<div class="container">
+    <div class="row">
+        <div class="col pl-4 bg-light border">
             <img src="{{ poke.sprites.front_default }}" alt="{{ poke.name }}">
         </div>
-        <div class="col-11 pt-4">
+        <div class="col-10 pt-4 bg-light border">
             <span class="align-middle"><h3>{{ poke.id }} - {{ poke.name }}</h3></span>
         </div>
     </div>
     <div class="row">
-        <div class="col bg-danger">
+        <div class="col bg-white border">
             <div class="pl-4 h5">Types:</div>
             {% for poke_type in poke.types %}
                 <div class="pl-4 h6">
@@ -20,8 +21,11 @@
                 </div>
             {% endfor %}
         </div>
-        <div class="col-11 bg-success"></div>
+        <div class="col-10 bg-white border">
+        {{ dex }}
+        </div>
     </div>
 </div>
+<div>
 {% endblock %}
 {% block footer %}{% endblock %}
