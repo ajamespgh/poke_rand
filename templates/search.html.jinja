@@ -1,3 +1,27 @@
 {% extends "base.html.jinja" %}
 {% set active_page = "search" %}
+{% block head %}
+{% endblock %}
 {% block title %}Search{% endblock %}
+{% block content %}
+<div class="container">
+    <form method="POST" action="/search">
+        <div class="form-group row">
+            <div class="col-sm">
+                <label for="lookupType">Type</label>
+                <select class="form-control" name="lookupType" id="lookupType">
+                    <option value="poke">Pokémon</option>
+                </select>
+            </div>
+            <div class="col-sm">
+                <label for="searchValue">Name</label>
+                <input type="text" class="form-control" name="searchValue" id="searchValue">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+    </form>
+</div>
+{% endblock %}
+{% block footer %}
+<script type="text/javascript" src="{{ url_for('static', filename='search.js') }}"></script>
+{% endblock %}
