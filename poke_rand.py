@@ -27,13 +27,17 @@ def search_handler():
 
 @app.route("/poke")
 def poke_display(poke: str):
-    poke_basic_info = requests.get(f'https://pokeapi.co/api/v2/pokemon/{poke}').json()
-    poke_dex_info = requests.get(f'https://pokeapi.co/api/v2/pokemon-species/{poke}').json()
-    dex_entry = ''
-    for entry in poke_dex_info['flavor_text_entries']:
-        if entry['language']['name'] == 'en':
-            dex_entry = entry['flavor_text']
-    return render_template('poke.html.jinja', nav="search", title="Search", poke=poke_basic_info, dex=dex_entry)
+    r = requests.get(f'https://pokeapi.co/api/v2/pokemon/{poke}')
+    if r.status_code == requests.codes.ok:
+        poke_basic_info = r.json()
+        poke_dex_info = requests.get(f'https://pokeapi.co/api/v2/pokemon-species/{poke}').json()
+        dex_entry = ''
+        for entry in poke_dex_info['flavor_text_entries']:
+            if entry['language']['name'] == 'en':
+                dex_entry = entry['flavor_text']
+        return render_template('poke.html.jinja', nav='search', title='Search', poke=poke_basic_info, dex=dex_entry)
+    else:
+        return render_template('not_found.html.jinja', title='Error', page='pokémon')
 
 
 @app.route("/random")
