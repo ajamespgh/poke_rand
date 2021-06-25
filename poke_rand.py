@@ -1,8 +1,10 @@
+import json
 import random
 import requests
 from flask import Flask
 from flask import request
 from flask import render_template
+from functools import lru_cache
 
 app = Flask(__name__)
 
@@ -25,19 +27,28 @@ def search_handler():
         return searches[request.form['lookupType']](request.form['searchValue'])
 
 
-@app.route("/poke")
-def poke_display(poke: str):
+@lru_cache
+def get_poke_info(poke: str):
     r = requests.get(f'https://pokeapi.co/api/v2/pokemon/{poke}')
+    return r.text if r.status_code == requests.codes.ok else False
+
+
+@lru_cache
+def get_dex_info(poke: str):
+    r = requests.get(f'https://pokeapi.co/api/v2/pokemon-species/{poke}')
     if r.status_code == requests.codes.ok:
-        poke_basic_info = r.json()
-        poke_dex_info = requests.get(f'https://pokeapi.co/api/v2/pokemon-species/{poke}').json()
-        dex_entry = ''
-        for entry in poke_dex_info['flavor_text_entries']:
+        for entry in r.json()['flavor_text_entries']:
             if entry['language']['name'] == 'en':
-                dex_entry = entry['flavor_text']
-        return render_template('poke.html.jinja', nav='search', title='Search', poke=poke_basic_info, dex=dex_entry)
-    else:
-        return render_template('not_found.html.jinja', title='Error', page='pokémon')
+                return entry['flavor_text']
+    return False
+
+
+def poke_display(poke: str):
+    poke_info = get_poke_info(poke)
+    dex_info = get_dex_info(poke)
+    if poke_info and dex_info:
+        return render_template('poke.html.jinja', nav='search', title='Search', poke=json.loads(poke_info), dex=dex_info)
+    return render_template('not_found.html.jinja', title='Error', page='pokémon')
 
 
 @app.route("/random")
